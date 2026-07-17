@@ -30,17 +30,14 @@ const envoyerReservation = async () => {
 
 📅 Date : ${date}`;
 
-  window.open(
-    `https://wa.me/2693315703?text=${encodeURIComponent(message)}`,
-    "_blank"
-  );
-
+  window.location.href =
+  `https://wa.me/2693315703?text=${encodeURIComponent(message)}`;
   setShowForm(false);
   setReservationEnvoyee(true);
 };
 
-  return (
-    <main>
+ return (
+  <main className="text-[85%] md:text-[100%]">
 
       {/* HERO */}
 
@@ -121,8 +118,8 @@ const envoyerReservation = async () => {
   <Image
     src="/images/affiche-Safarikom.png"
     alt="Affiche SAFARIKOM"
-    width={350}
-    height={500}
+    width={200}
+    height={300}
     priority
     className="rounded-2xl shadow-2xl border-4 border-white"
   />
@@ -456,8 +453,8 @@ const envoyerReservation = async () => {
       </section>
       {/* TARIFS */}
 
+{!showForm && !reservationEnvoyee && (
 <section id="reservation" className="py-24 bg-white">
-
   <div className="max-w-6xl mx-auto px-6">
 
     <h2 className="text-5xl font-bold text-center text-green-700">
@@ -546,6 +543,7 @@ const envoyerReservation = async () => {
   </div>
 
 </section>
+)}
 {showForm && (
   <section
     id="formulaire"
