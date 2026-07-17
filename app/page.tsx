@@ -690,11 +690,9 @@ onChange={(e)=>setNom(e.target.value)}
           Numéro : +269 XXX XX XX
         </p>
 
-        <button
-          onClick={() =>
-            window.open(
-              `https://wa.me/2693315703?text=${encodeURIComponent(
-`Bonjour,
+       <button
+  onClick={() => {
+    const message = `Bonjour,
 
 Je viens d'effectuer mon paiement MVola.
 
@@ -703,15 +701,15 @@ Prénom : ${prenom}
 
 Circuit : ${circuit}
 
-Merci de confirmer ma réservation.`
-              )}`,
-              "_blank"
-            )
-          }
-          className="mt-8 bg-green-700 text-white px-8 py-3 rounded-full hover:bg-green-800"
-        >
-          J'ai payé par Mvola
-        </button>
+Merci de confirmer ma réservation.`;
+
+    window.location.href =
+      `https://wa.me/2693315703?text=${encodeURIComponent(message)}`;
+  }}
+  className="mt-8 bg-green-700 text-white px-8 py-3 rounded-full hover:bg-green-800"
+>
+  J'ai payé par Mvola
+</button>
 
       </div>
 
@@ -722,33 +720,33 @@ Merci de confirmer ma réservation.`
         <div className="text-6xl">💵</div>
 
         <h3 className="text-2xl font-bold mt-6">
-          Paiement sur place
+          Paiement en espèce
         </h3>
 
         <p className="mt-4">
           FESTICOM – Moroni Coulé
         </p>
 
-        <button
-          onClick={() =>
-            window.open(
-              `https://wa.me/2693315703?text=${encodeURIComponent(
-`Bonjour,
+       <button
+  onClick={() => {
+    const message = `Bonjour,
 
-Je souhaite régler ma réservation sur place.
+Je souhaite régler ma réservation en espèces au QG du FESTICOM 2026.
 
 Nom : ${nom}
 Prénom : ${prenom}
 
-Circuit : ${circuit}`
-              )}`,
-              "_blank"
-            )
-          }
-          className="mt-8 bg-green-700 text-white px-8 py-3 rounded-full hover:bg-green-800"
-        >
-          Je paierai sur place
-        </button>
+Circuit : ${circuit}
+
+Merci de m'indiquer où et quand effectuer le paiement en espèces.`;
+
+    window.location.href =
+      `https://wa.me/2693315703?text=${encodeURIComponent(message)}`;
+  }}
+  className="mt-8 bg-green-700 text-white px-8 py-3 rounded-full hover:bg-green-800"
+>
+  Je paierai en espèces
+</button>
 
       </div>
 
