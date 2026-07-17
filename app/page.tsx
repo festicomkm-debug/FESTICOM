@@ -361,7 +361,7 @@ const envoyerReservation = async () => {
             />
 
             <img
-              src="/images/Safari22.png"
+              src="/images/Safari.png"
               className="rounded-3xl shadow-lg h-72 w-full object-cover hover:scale-105 transition duration-300"
             />
 
