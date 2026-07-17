@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 export default function Home() {
   const [showForm, setShowForm] = useState(false);
@@ -11,6 +11,15 @@ const [telephone, setTelephone] = useState("");
 const [email, setEmail] = useState("");
 const [date, setDate] = useState("");
 const [reservationEnvoyee, setReservationEnvoyee] = useState(false);
+const [heroImage, setHeroImage] = useState(0);
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    setHeroImage((prev) => (prev === 0 ? 1 : 0));
+  }, 5000);
+
+  return () => clearInterval(interval);
+}, []);
 
 const envoyerReservation = async () => {
   if (!nom || !prenom || !telephone || !email || !date) {
@@ -44,7 +53,7 @@ const envoyerReservation = async () => {
       <section className="relative h-screen w-full">
 
         <Image
-          src="/images/ecran.jpeg"
+          src={heroImage === 0 ? "/images/ecran.jpeg" : "/images/affiche-safarikom.png"}
           alt="FESTICOM"
           fill
           priority
@@ -55,8 +64,7 @@ const envoyerReservation = async () => {
 
         {/* NAVBAR */}
 
-        <nav className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-10 py-6">
-
+       <nav className="absolute top-0 left-0 right-0 z-20 flex items-center justify-center px-8 py-6">
           <Image
             src="/images/logo-festicom.png"
             alt="Logo FESTICOM"
@@ -64,8 +72,7 @@ const envoyerReservation = async () => {
             height={120}
           />
 
-          <div className="hidden md:flex gap-8 text-white font-semibold">
-
+          <div className="flex gap-8 text-white font-semibold">
             <a href="#">Accueil</a>
 
             <a href="#festival">Festival</a>
@@ -115,14 +122,7 @@ const envoyerReservation = async () => {
 </div>
 
 <div className="mt-8 flex justify-center">
-  <Image
-    src="/images/affiche-Safarikom.png"
-    alt="Affiche SAFARIKOM"
-    width={200}
-    height={300}
-    priority
-    className="rounded-2xl shadow-2xl border-4 border-white"
-  />
+  
 </div>
 
 </div>
