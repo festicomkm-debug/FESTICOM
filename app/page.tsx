@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { supabase } from "@/lib/supabase";
+import QRCode from "qrcode";
 export default function Home() {
   const [showForm, setShowForm] = useState(false);
 const [circuit, setCircuit] = useState("");
@@ -26,6 +28,30 @@ const envoyerReservation = async () => {
     alert("Veuillez remplir tous les champs.");
     return;
   }
+  const reservationNumber = "FEST-" + Date.now();
+const qrCode = await QRCode.toDataURL(reservationNumber);
+  const { error } = await supabase
+  .from("reservations")
+  .insert([
+    {
+      reservation_number: reservationNumber,
+      nom,
+      prenom,
+      telephone,
+      email,
+      date,
+      circuit,
+      paiement: "En attente",
+      statut: "Non utilisé",
+      qr_code: qrCode,
+    },
+  ]);
+
+if (error) {
+  alert("Erreur lors de l'enregistrement.");
+  console.error(error);
+  return;
+}
 
   const message = `🎉 *NOUVELLE RÉSERVATION FESTICOM*
 
@@ -537,8 +563,33 @@ const envoyerReservation = async () => {
 </button>
 
       </div>
+     <div className="rounded-3xl shadow-xl p-10 text-center border">
 
-    </div>
+  <h3 className="text-3xl font-bold">
+    🏢 Exposant / Prestataire
+  </h3>
+
+  <p className="mt-6 text-3xl font-black text-green-700">
+    Tarif personnalisé
+  </p>
+
+  <p className="mt-2 text-gray-500">
+    Le montant sera communiqué après étude de votre demande.
+  </p>
+
+  <button
+    onClick={() => {
+      setCircuit("🏢 Exposant / Prestataire");
+      setShowForm(true);
+    }}
+    className="mt-10 bg-green-700 text-white px-8 py-4 rounded-full hover:bg-green-800 transition"
+  >
+    Réserver
+  </button>
+
+</div>
+</div>
+
 
   </div>
 
@@ -687,7 +738,7 @@ onChange={(e)=>setNom(e.target.value)}
         </h3>
 
         <p className="mt-4">
-          Numéro : +269 XXX XX XX
+          Numéro : +269 400 85 83
         </p>
 
        <button
@@ -745,7 +796,7 @@ Merci de m'indiquer où et quand effectuer le paiement en espèces.`;
   }}
   className="mt-8 bg-green-700 text-white px-8 py-3 rounded-full hover:bg-green-800"
 >
-  Je paierai en espèces
+  Je veux payer en espèces
 </button>
 
       </div>
