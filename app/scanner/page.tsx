@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { supabase } from "@/lib/supabase";
 
@@ -16,10 +17,46 @@ type Reservation = {
 };
 
 export default function ScannerPage() {
+  const router = useRouter();
+
   const [reservation, setReservation] = useState<Reservation | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    verifierConnexion();
+  }, []);
+
+  async function verifierConnexion() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      router.push("/login");
+      return;
+    }
+
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", session.user.id)
+      .single();
+
+    if (error || !profile) {
+      await supabase.auth.signOut();
+      router.push("/login");
+      return;
+    }
+
+    if (profile.role !== "scanner") {
+      router.push("/admin");
+      return;
+    }
+
+    initialiserScanner();
+  }
+
+  function initialiserScanner() {
     const scanner = new Html5QrcodeScanner(
       "reader",
       {
@@ -31,7 +68,6 @@ export default function ScannerPage() {
 
     scanner.render(
       async (decodedText) => {
-
         setLoading(true);
 
         const reservationNumber = decodedText.replace(
@@ -49,7 +85,6 @@ export default function ScannerPage() {
 
         if (error || !data) {
           alert("❌ Billet introuvable");
-
           scanner.resume();
           return;
         }
@@ -58,11 +93,8 @@ export default function ScannerPage() {
       },
       () => {}
     );
+  }
 
-    return () => {
-      scanner.clear().catch(() => {});
-    };
-  }, []);
   async function validerEntree() {
     if (!reservation) return;
 
@@ -89,12 +121,25 @@ export default function ScannerPage() {
     alert("✅ Entrée validée avec succès.");
   }
 
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    router.push("/login");
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 p-6 flex flex-col items-center">
+      <div className="w-full max-w-lg flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">
+          Scanner FESTICOM
+        </h1>
 
-      <h1 className="text-3xl font-bold mb-6">
-        Scanner FESTICOM
-      </h1>
+        <button
+          onClick={handleLogout}
+          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold"
+        >
+          Déconnexion
+        </button>
+      </div>
 
       {!reservation && (
         <>
@@ -110,7 +155,6 @@ export default function ScannerPage() {
 
       {reservation && (
         <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
-
           <h2 className="text-2xl font-bold mb-4 text-center">
             Billet trouvé
           </h2>
@@ -124,7 +168,13 @@ export default function ScannerPage() {
 
           <p className="mt-2">
             <strong>Paiement :</strong>{" "}
-            <span className="text-green-600">
+            <span
+              className={
+                reservation.paiement === "Payé"
+                  ? "text-green-600 font-bold"
+                  : "text-red-600 font-bold"
+              }
+            >
               {reservation.paiement}
             </span>
           </p>
@@ -157,10 +207,8 @@ export default function ScannerPage() {
           >
             Scanner un autre billet
           </button>
-
         </div>
       )}
-
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 type Reservation = {
@@ -15,11 +16,48 @@ type Reservation = {
 };
 
 export default function AdminPage() {
+  const router = useRouter();
+
   const [reservations, setReservations] = useState<Reservation[]>([]);
 
   useEffect(() => {
-    fetchReservations();
+    verifierConnexion();
   }, []);
+
+  async function logout() {
+    await supabase.auth.signOut();
+    router.push("/login");
+  }
+
+  async function verifierConnexion() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      router.push("/login");
+      return;
+    }
+
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", session.user.id)
+      .single();
+
+    if (error || !profile) {
+      await supabase.auth.signOut();
+      router.push("/login");
+      return;
+    }
+
+    if (profile.role !== "admin") {
+      router.push("/scanner");
+      return;
+    }
+
+    fetchReservations();
+  }
 
   async function fetchReservations() {
     const { data, error } = await supabase
@@ -34,11 +72,7 @@ export default function AdminPage() {
 
     setReservations(data ?? []);
   }
-
   async function validerPaiement(reservationNumber: string) {
-    console.log("===== VALIDER PAIEMENT =====");
-    console.log(reservationNumber);
-
     const { data, error } = await supabase
       .from("reservations")
       .update({ paiement: "Payé" })
@@ -55,9 +89,7 @@ export default function AdminPage() {
     const reservation = data?.[0];
 
     if (reservation) {
-      console.log("Envoi vers /api/send-ticket");
-
-      const response = await fetch("/api/send-ticket", {
+      await fetch("/api/send-ticket", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -72,11 +104,8 @@ export default function AdminPage() {
         }),
       });
 
-      console.log("Status :", response.status);
-      console.log(await response.text());
-
       const message = encodeURIComponent(
-`Bonjour ${reservation.prenom} ${reservation.nom},
+        `Bonjour ${reservation.prenom} ${reservation.nom},
 
 Votre paiement FESTICOM a été validé ✅
 
@@ -113,6 +142,15 @@ Merci et à bientôt !`
       <h1 className="text-3xl font-bold mb-6">
         Administration FESTICOM
       </h1>
+
+      <div className="mb-6">
+        <button
+          onClick={logout}
+          className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg"
+        >
+          Déconnexion
+        </button>
+      </div>
 
       <div className="overflow-x-auto bg-white rounded-lg shadow">
         <table className="w-full border-collapse">
@@ -182,8 +220,11 @@ Merci et à bientôt !`
                       )
                     }
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+                    disabled={reservation.paiement === "Payé"}
                   >
-                    Valider Paiement
+                    {reservation.paiement === "Payé"
+                      ? "Paiement validé"
+                      : "Valider Paiement"}
                   </button>
 
                   <button
@@ -193,8 +234,11 @@ Merci et à bientôt !`
                       )
                     }
                     className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full"
+                    disabled={reservation.statut === "Utilisé"}
                   >
-                    Valider Billet
+                    {reservation.statut === "Utilisé"
+                      ? "Billet utilisé"
+                      : "Valider Billet"}
                   </button>
                 </td>
               </tr>
