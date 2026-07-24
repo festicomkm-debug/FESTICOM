@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
   photo: {
     position: "absolute",
     left: 42,
-    top: 223,
+    top: 220,
     width: 84,
     height: 105,
     borderRadius: 8,
@@ -65,9 +65,9 @@ const styles = StyleSheet.create({
   qr: {
     position: "absolute",
     left: 220,
-    top: 255,
-    width: 70,
-    height: 70,
+    top: 265,
+    width: 65,
+    height: 65,
   },
 });
 
@@ -87,7 +87,7 @@ type Props = {
 
 export default function BadgeStaffPDF({ staff }: Props) {
   // Récupération dynamique de l'origine du site pour pointer vers /images/badge-staff.png
-  const baseUrl = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://www.festikom.com";
 
   return (
     <Document>

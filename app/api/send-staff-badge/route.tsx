@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import React from "react";
 import { renderToBuffer } from "@react-pdf/renderer";
 import BadgeStaffPDF from "@/components/BadgeStaffPDF";
+import QRCode from "qrcode";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
@@ -65,7 +66,9 @@ export async function POST(request: Request) {
       staff.matricule = matricule;
     }
 
-    const qrCode = `FESTICOM|STAFF|${staff.matricule}`;
+    const qrCode = await QRCode.toDataURL(
+  `FESTICOM|STAFF|${staff.matricule}`
+);
 
     const pdfBuffer = await renderToBuffer(
   <BadgeStaffPDF
